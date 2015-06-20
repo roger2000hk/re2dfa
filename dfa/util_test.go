@@ -34,9 +34,9 @@ func TestAppendToRange(t *testing.T) {
 		{[]rune{'c', 'z'}, 'q', []rune{'c', 'z'}},
 	}
 	for _, tc := range testCases {
-		got := appendToRange(tc.a, tc.r)
+		got := addToRange(tc.a, tc.r)
 		if !reflect.DeepEqual(got, tc.want) {
-			t.Errorf("appendToRange(%q, %c) = %q, want %q", string(tc.a), tc.r, string(got), string(tc.want))
+			t.Errorf("addToRange(%q, %c) = %q, want %q", string(tc.a), tc.r, string(got), string(tc.want))
 		}
 	}
 }

@@ -187,7 +187,7 @@ func constructSubset(root *Node, ctx *context) {
 				constructSubset(node, ctx)
 			}
 
-			m[node] = appendToRange(m[node], r)
+			m[node] = addToRange(m[node], r)
 		}
 	}
 

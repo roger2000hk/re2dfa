@@ -40,7 +40,7 @@ func inRange(r rune, ranges []rune) bool {
 	return false
 }
 
-func appendToRange(ranges []rune, r rune) []rune {
+func addToRange(ranges []rune, r rune) []rune {
 	if len(ranges) == 0 {
 		return []rune{r, r}
 	}
