@@ -67,41 +67,6 @@ func addToRange(ranges []rune, r rune) []rune {
 	return ranges
 }
 
-func rangesToBoolExpr(rr []rune, atEnd bool) string {
-	s := make([]string, 0, len(rr))
-	for i := 0; i < len(rr); i += 2 {
-		if rr[i] < 0 {
-			switch rr[i] {
-			case -100: // BeginText
-				s = append(s, "i == rlen")
-			case -200: // EndText
-				if atEnd {
-					s = append(s, "i == len(s)")
-				} else {
-					s = append(s, "false")
-				}
-			case -300: // BeginLine
-				s = append(s, `i == rlen || r == '\n'`)
-			case -400: // EndLine
-				if atEnd {
-					s = append(s, `i == len(s) || s[i] == '\n'`)
-				} else {
-					s = append(s, `i <= len(s) && s[i-1] == '\n'`)
-				}
-			case -500: // WordBoundary
-				s = append(s, "(i > rlen && isWordChar(s[i-rlen-1])) != (rlen > 0 && isWordChar(s[i-1]))")
-			case -600: // NoWordBoundary
-				s = append(s, "(i > rlen && isWordChar(s[i-rlen-1])) == (rlen > 0 && isWordChar(s[i-1]))")
-			}
-		} else if rr[i] == rr[i+1] {
-			s = append(s, fmt.Sprintf("r == %d", rr[i]))
-		} else {
-			s = append(s, fmt.Sprintf("(r >= %d && r <= %d)", rr[i], rr[i+1]))
-		}
-	}
-	return strings.Join(s, "||")
-}
-
 func copyOf(r []rune) []rune {
 	rr := make([]rune, len(r))
 	copy(rr, r)
@@ -151,4 +116,39 @@ func foldRanges(a, b []rune) []rune {
 	}
 
 	return d
+}
+
+func rangesToBoolExpr(rr []rune, atEnd bool) string {
+	s := make([]string, 0, len(rr))
+	for i := 0; i < len(rr); i += 2 {
+		if rr[i] < 0 {
+			switch rr[i] {
+			case -100: // BeginText
+				s = append(s, "i == rlen")
+			case -200: // EndText
+				if atEnd {
+					s = append(s, "i == len(s)")
+				} else {
+					s = append(s, "false")
+				}
+			case -300: // BeginLine
+				s = append(s, `i == rlen || r == '\n'`)
+			case -400: // EndLine
+				if atEnd {
+					s = append(s, `i == len(s) || s[i] == '\n'`)
+				} else {
+					s = append(s, `i <= len(s) && s[i-1] == '\n'`)
+				}
+			case -500: // WordBoundary
+				s = append(s, "(i > rlen && isWordChar(s[i-rlen-1])) != (rlen > 0 && isWordChar(s[i-1]))")
+			case -600: // NoWordBoundary
+				s = append(s, "(i > rlen && isWordChar(s[i-rlen-1])) == (rlen > 0 && isWordChar(s[i-1]))")
+			}
+		} else if rr[i] == rr[i+1] {
+			s = append(s, fmt.Sprintf("r == %d", rr[i]))
+		} else {
+			s = append(s, fmt.Sprintf("(r >= %d && r <= %d)", rr[i], rr[i+1]))
+		}
+	}
+	return strings.Join(s, "||")
 }
