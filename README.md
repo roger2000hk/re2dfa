@@ -14,6 +14,7 @@ re2dfa transforms regular expressions into deterministic finite state machines a
 # TODO
 
 * Support non-greedy matches.
+* Optimize generation from regular expressions containing broad unicode ranges.
 
 # License
 
