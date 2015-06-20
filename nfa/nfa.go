@@ -36,7 +36,11 @@ func (c *context) node() *Node {
 }
 
 func (n *Node) copy() *Node {
-	nn := Node{S: n.S, F: n.F, T: make([]T, len(n.T))}
+	nn := Node{
+		S: n.S,
+		F: n.F,
+		T: make([]T, len(n.T)),
+	}
 	copy(nn.T, n.T)
 	return &nn
 }
