@@ -335,14 +335,13 @@ outer:
 	var buf2 bytes.Buffer
 	for _, n := range nodes {
 		hasEndStates := false
-	outer1:
 		for _, t := range n.T {
 			if !t.N.F {
 				continue
 			}
-			for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
+			if len(t.R) > 0 && t.R[0] < 0 {
 				hasEndStates = true
-				break outer1
+				break
 			}
 		}
 		if !hasEndStates {
