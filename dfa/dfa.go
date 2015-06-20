@@ -341,10 +341,8 @@ outer:
 				continue
 			}
 			for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
-				if t.R[i] < 0 {
-					hasEndStates = true
-					break outer1
-				}
+				hasEndStates = true
+				break outer1
 			}
 		}
 		if !hasEndStates {
@@ -360,9 +358,7 @@ outer:
 			}
 			var rr []rune
 			for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
-				if t.R[i] < 0 {
-					rr = append(rr, t.R[i:i+2]...)
-				}
+				rr = append(rr, t.R[i:i+2]...)
 			}
 			if len(rr) > 0 {
 				fmt.Fprintf(&buf2, "case %s:\n", rangesToBoolExpr(rr, true))
