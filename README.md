@@ -1,4 +1,4 @@
-re2dfa
+re2dfa [![Build Status](https://travis-ci.org/opennota/re2dfa.png?branch=master)](https://travis-ci.org/opennota/re2dfa)
 ======
 
 re2dfa transforms regular expressions into deterministic finite state machines and outputs Go source code containing the matching function.
