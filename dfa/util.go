@@ -17,6 +17,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/opennota/re2dfa/nfa"
 )
 
 func intsToStrings(a []int) []string {
@@ -123,24 +125,24 @@ func rangesToBoolExpr(rr []rune, atEnd bool) string {
 	for i := 0; i < len(rr); i += 2 {
 		if rr[i] < 0 {
 			switch rr[i] {
-			case -100: // BeginText
+			case nfa.RuneBeginText:
 				s = append(s, "i == 0")
-			case -200: // EndText
+			case nfa.RuneEndText:
 				s = append(s, "i == len(s)")
-			case -300: // BeginLine
+			case nfa.RuneBeginLine:
 				s = append(s, `i == 0 || r == '\n'`)
-			case -400: // EndLine
+			case nfa.RuneEndLine:
 				s = append(s, `i == len(s) || s[i] == '\n'`)
-			case -500: // WordBoundary
+			case nfa.RuneWordBoundary:
 				s = append(s, "(i >= rlen && isWordChar(s[i-rlen])) != (rlen > 0 && i < len(s) && isWordChar(s[i]))")
-			case -600: // NoWordBoundary
+			case nfa.RuneNoWordBoundary:
 				s = append(s, "(i >= rlen && isWordChar(s[i-rlen])) == (rlen > 0 && i < len(s) && isWordChar(s[i]))")
 			}
 		} else if rr[i] == rr[i+1] {
 			s = append(s, fmt.Sprintf("r == %d", rr[i]))
 		} else if rr[i] == 0 {
 			s = append(s, fmt.Sprintf("r <= %d", rr[i+1]))
-		} else if rr[i+1] == '\U0010ffff' {
+		} else if rr[i+1] == nfa.RuneLast {
 			s = append(s, fmt.Sprintf("r >= %d", rr[i]))
 		} else {
 			s = append(s, fmt.Sprintf("r >= %d && r <= %d", rr[i], rr[i+1]))

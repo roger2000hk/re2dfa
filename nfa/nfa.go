@@ -15,6 +15,19 @@ package nfa
 
 import "regexp/syntax"
 
+const (
+	// Last unicode rune
+	RuneLast = 0x10ffff
+
+	// Pseudo-runes
+	RuneBeginText = -100 * iota
+	RuneEndText
+	RuneBeginLine
+	RuneEndLine
+	RuneWordBoundary
+	RuneNoWordBoundary
+)
+
 type Node struct {
 	S int  // state
 	F bool // final?
@@ -127,42 +140,42 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 	case syntax.OpAnyCharNotNL:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{0, 9, 11, '\U0010ffff'}, N: end})
+		begin.T = append(begin.T, T{R: []rune{0, 9, 11, RuneLast}, N: end})
 
 	case syntax.OpAnyChar:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{0, '\U0010ffff'}, N: end})
+		begin.T = append(begin.T, T{R: []rune{0, RuneLast}, N: end})
 
 	case syntax.OpBeginLine:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{-300, -300}, N: end})
+		begin.T = append(begin.T, T{R: []rune{RuneBeginLine, RuneBeginLine}, N: end})
 
 	case syntax.OpEndLine:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{-400, -400}, N: end})
+		begin.T = append(begin.T, T{R: []rune{RuneEndLine, RuneEndLine}, N: end})
 
 	case syntax.OpBeginText:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{-100, -100}, N: end})
+		begin.T = append(begin.T, T{R: []rune{RuneBeginText, RuneBeginText}, N: end})
 
 	case syntax.OpEndText:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{-200, -200}, N: end})
+		begin.T = append(begin.T, T{R: []rune{RuneEndText, RuneEndText}, N: end})
 
 	case syntax.OpWordBoundary:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{-500, -500}, N: end})
+		begin.T = append(begin.T, T{R: []rune{RuneWordBoundary, RuneWordBoundary}, N: end})
 
 	case syntax.OpNoWordBoundary:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: []rune{-600, -600}, N: end})
+		begin.T = append(begin.T, T{R: []rune{RuneNoWordBoundary, RuneNoWordBoundary}, N: end})
 
 	case syntax.OpCapture:
 		return recursiveNewFromRegexp(r.Sub[0], ctx)

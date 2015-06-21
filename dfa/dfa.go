@@ -288,7 +288,7 @@ outer:
 			fmt.Fprintln(&buf, "switch {")
 			for _, t := range n.T {
 				for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
-					if t.R[i] == -500 || t.R[i] == -600 { // WordBoundary | NoWordBoundary
+					if t.R[i] == nfa.RuneWordBoundary || t.R[i] == nfa.RuneNoWordBoundary {
 						usesIsWordChar = true
 					}
 					fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:i+2], false))
