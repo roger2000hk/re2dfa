@@ -138,6 +138,10 @@ func rangesToBoolExpr(rr []rune, atEnd bool) string {
 			}
 		} else if rr[i] == rr[i+1] {
 			s = append(s, fmt.Sprintf("r == %d", rr[i]))
+		} else if rr[i] == 0 {
+			s = append(s, fmt.Sprintf("r <= %d", rr[i+1]))
+		} else if rr[i+1] == '\U0010ffff' {
+			s = append(s, fmt.Sprintf("r >= %d", rr[i]))
 		} else {
 			s = append(s, fmt.Sprintf("r >= %d && r <= %d", rr[i], rr[i+1]))
 		}
