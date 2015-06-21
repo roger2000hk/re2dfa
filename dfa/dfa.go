@@ -278,7 +278,7 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 
 	var buf bytes.Buffer
 
-	for _, n := range nodes {
+	for ni, n := range nodes {
 		if len(n.T) == 0 {
 			continue
 		}
@@ -380,7 +380,9 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 			fmt.Fprintln(&buf, "}")
 		}
 		if enableLazy {
-			fmt.Fprintln(&buf, "goto lazy")
+			if ni != len(nodes)-1 {
+				fmt.Fprintln(&buf, "goto lazy")
+			}
 		} else {
 			fmt.Fprintln(&buf, "return")
 		}
