@@ -124,11 +124,11 @@ func rangesToBoolExpr(rr []rune, atEnd bool) string {
 		if rr[i] < 0 {
 			switch rr[i] {
 			case -100: // BeginText
-				s = append(s, "i == rlen")
+				s = append(s, "i == 0")
 			case -200: // EndText
 				s = append(s, "i == len(s)")
 			case -300: // BeginLine
-				s = append(s, `i == rlen || r == '\n'`)
+				s = append(s, `i == 0 || r == '\n'`)
 			case -400: // EndLine
 				s = append(s, `i == len(s) || s[i] == '\n'`)
 			case -500: // WordBoundary
