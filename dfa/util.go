@@ -126,28 +126,20 @@ func rangesToBoolExpr(rr []rune, atEnd bool) string {
 			case -100: // BeginText
 				s = append(s, "i == rlen")
 			case -200: // EndText
-				if atEnd {
-					s = append(s, "i == len(s)")
-				} else {
-					s = append(s, "false")
-				}
+				s = append(s, "i == len(s)")
 			case -300: // BeginLine
 				s = append(s, `i == rlen || r == '\n'`)
 			case -400: // EndLine
-				if atEnd {
-					s = append(s, `i == len(s) || s[i] == '\n'`)
-				} else {
-					s = append(s, `i <= len(s) && s[i-1] == '\n'`)
-				}
+				s = append(s, `i == len(s) || s[i] == '\n'`)
 			case -500: // WordBoundary
-				s = append(s, "(i > rlen && isWordChar(s[i-rlen-1])) != (rlen > 0 && isWordChar(s[i-1]))")
+				s = append(s, "(i >= rlen && isWordChar(s[i-rlen])) != (rlen > 0 && i < len(s) && isWordChar(s[i]))")
 			case -600: // NoWordBoundary
-				s = append(s, "(i > rlen && isWordChar(s[i-rlen-1])) == (rlen > 0 && isWordChar(s[i-1]))")
+				s = append(s, "(i >= rlen && isWordChar(s[i-rlen])) == (rlen > 0 && i < len(s) && isWordChar(s[i]))")
 			}
 		} else if rr[i] == rr[i+1] {
 			s = append(s, fmt.Sprintf("r == %d", rr[i]))
 		} else {
-			s = append(s, fmt.Sprintf("(r >= %d && r <= %d)", rr[i], rr[i+1]))
+			s = append(s, fmt.Sprintf("r >= %d && r <= %d", rr[i], rr[i+1]))
 		}
 	}
 	return strings.Join(s, "||")
