@@ -4,10 +4,6 @@ package test
 
 import "unicode/utf8"
 
-//func isWordChar(r byte) bool {
-//        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
-//}
-
 func matchPlus(s string) (end int) {
 	end = -1
 	var r rune
