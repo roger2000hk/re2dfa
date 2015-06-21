@@ -15,7 +15,6 @@ func matchStartOfLineEmpty(s string) (end int) {
 	switch {
 	case i == rlen || r == '\n':
 		end = i
-		return
 	}
 	return
 }

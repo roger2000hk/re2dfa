@@ -28,7 +28,6 @@ s2:
 	switch {
 	case i == len(s) || s[i] == '\n':
 		end = i
-		return
 	}
 	return
 }

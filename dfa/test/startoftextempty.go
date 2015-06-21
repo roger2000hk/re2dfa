@@ -15,7 +15,6 @@ func matchStartOfTextEmpty(s string) (end int) {
 	switch {
 	case i == rlen:
 		end = i
-		return
 	}
 	return
 }

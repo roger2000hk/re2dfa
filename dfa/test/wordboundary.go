@@ -28,7 +28,6 @@ s2:
 	switch {
 	case (i >= rlen && isWordChar(s[i-rlen])) != (rlen > 0 && i < len(s) && isWordChar(s[i])):
 		end = i
-		return
 	}
 	return
 }
