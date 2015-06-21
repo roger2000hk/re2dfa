@@ -1,4 +1,4 @@
-re2dfa [![Build Status](https://travis-ci.org/opennota/re2dfa.png?branch=master)](https://travis-ci.org/opennota/re2dfa)
+re2dfa [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html) [![Build Status](https://travis-ci.org/opennota/re2dfa.png?branch=master)](https://travis-ci.org/opennota/re2dfa)
 ======
 
 re2dfa transforms regular expressions into deterministic finite state machines and outputs Go source code containing the matching function.
@@ -14,7 +14,3 @@ re2dfa transforms regular expressions into deterministic finite state machines a
 # TODO
 
 * Optimize generation from regular expressions containing multiple broad unicode ranges, such as `.*` or `[^a-z]`.
-
-# License
-
-GNU GPL v3+
