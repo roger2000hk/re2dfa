@@ -8,67 +8,75 @@ import "unicode/utf8"
 //        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
 //}
 
-func matchLiteral(s string) int {
-	st := 1
-	end := -1
-	i := 0
+func matchLiteral(s string) (end int) {
+	end = -1
 	var r rune
-	_ = r
 	var rlen int
-
-	for {
-		r, rlen = utf8.DecodeRuneInString(s[i:])
-		if rlen == 0 {
-			break
-		}
-		i += rlen
-
-		switch st {
-		case 1:
-			switch {
-			case r == 97:
-				st = 2
-			default:
-				return end
-			}
-		case 2:
-			switch {
-			case r == 98:
-				st = 3
-			default:
-				return end
-			}
-		case 3:
-			switch {
-			case r == 99:
-				st = 4
-			default:
-				return end
-			}
-		case 4:
-			switch {
-			case r == 100:
-				st = 5
-			default:
-				return end
-			}
-		case 5:
-			switch {
-			case r == 101:
-				st = 6
-			default:
-				return end
-			}
-		case 6:
-			switch {
-			case r == 102:
-				end = i
-				return end
-			default:
-				return end
-			}
-		}
+	i := 0
+	_, _, _ = r, rlen, i
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
 	}
-
-	return end
+	i += rlen
+	switch {
+	case r == 97:
+		goto s2
+	}
+	return
+s2:
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
+	}
+	i += rlen
+	switch {
+	case r == 98:
+		goto s3
+	}
+	return
+s3:
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
+	}
+	i += rlen
+	switch {
+	case r == 99:
+		goto s4
+	}
+	return
+s4:
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
+	}
+	i += rlen
+	switch {
+	case r == 100:
+		goto s5
+	}
+	return
+s5:
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
+	}
+	i += rlen
+	switch {
+	case r == 101:
+		goto s6
+	}
+	return
+s6:
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
+	}
+	i += rlen
+	switch {
+	case r == 102:
+		end = i
+	}
+	return
 }

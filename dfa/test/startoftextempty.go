@@ -2,47 +2,20 @@
 
 package test
 
-import "unicode/utf8"
-
 //func isWordChar(r byte) bool {
 //        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
 //}
 
-func matchStartOfTextEmpty(s string) int {
-	st := 1
-	end := -1
-	i := 0
+func matchStartOfTextEmpty(s string) (end int) {
+	end = -1
 	var r rune
-	_ = r
 	var rlen int
-
-	for {
-		r, rlen = utf8.DecodeRuneInString(s[i:])
-		if rlen == 0 {
-			break
-		}
-		i += rlen
-
-		switch st {
-		case 1:
-			switch {
-			case i == rlen:
-				end = i - rlen
-				return end
-			default:
-				return end
-			}
-		}
+	i := 0
+	_, _, _ = r, rlen, i
+	switch {
+	case i == rlen:
+		end = i
+		return
 	}
-
-	switch st {
-	case 1:
-		switch {
-		case i == rlen:
-			end = i
-		}
-
-	}
-
-	return end
+	return
 }

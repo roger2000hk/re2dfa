@@ -8,40 +8,33 @@ import "unicode/utf8"
 //        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
 //}
 
-func matchPlus(s string) int {
-	st := 1
-	end := -1
-	i := 0
+func matchPlus(s string) (end int) {
+	end = -1
 	var r rune
-	_ = r
 	var rlen int
-
-	for {
-		r, rlen = utf8.DecodeRuneInString(s[i:])
-		if rlen == 0 {
-			break
-		}
-		i += rlen
-
-		switch st {
-		case 1:
-			switch {
-			case r == 97:
-				end = i
-				st = 2
-			default:
-				return end
-			}
-		case 2:
-			switch {
-			case r == 97:
-				end = i
-				st = 2
-			default:
-				return end
-			}
-		}
+	i := 0
+	_, _, _ = r, rlen, i
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
 	}
-
-	return end
+	i += rlen
+	switch {
+	case r == 97:
+		end = i
+		goto s2
+	}
+	return
+s2:
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
+	}
+	i += rlen
+	switch {
+	case r == 97:
+		end = i
+		goto s2
+	}
+	return
 }

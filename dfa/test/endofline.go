@@ -8,48 +8,27 @@ import "unicode/utf8"
 //        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
 //}
 
-func matchEndOfLine(s string) int {
-	st := 1
-	end := -1
-	i := 0
+func matchEndOfLine(s string) (end int) {
+	end = -1
 	var r rune
-	_ = r
 	var rlen int
-
-	for {
-		r, rlen = utf8.DecodeRuneInString(s[i:])
-		if rlen == 0 {
-			break
-		}
-		i += rlen
-
-		switch st {
-		case 1:
-			switch {
-			case r == 97:
-				st = 2
-			default:
-				return end
-			}
-		case 2:
-			switch {
-			case i <= len(s) && s[i-1] == '\n':
-				end = i - rlen
-				return end
-			default:
-				return end
-			}
-		}
+	i := 0
+	_, _, _ = r, rlen, i
+	r, rlen = utf8.DecodeRuneInString(s[i:])
+	if rlen == 0 {
+		return
 	}
-
-	switch st {
-	case 2:
-		switch {
-		case i == len(s) || s[i] == '\n':
-			end = i
-		}
-
+	i += rlen
+	switch {
+	case r == 97:
+		goto s2
 	}
-
-	return end
+	return
+s2:
+	switch {
+	case i == len(s) || s[i] == '\n':
+		end = i
+		return
+	}
+	return
 }
