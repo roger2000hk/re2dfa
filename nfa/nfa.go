@@ -26,6 +26,7 @@ const (
 	RuneEndLine
 	RuneWordBoundary
 	RuneNoWordBoundary
+	RuneLazy
 )
 
 type Node struct {
@@ -181,27 +182,39 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 		return recursiveNewFromRegexp(r.Sub[0], ctx)
 
 	case syntax.OpStar:
+		var lazy []rune
+		if r.Flags&syntax.NonGreedy != 0 {
+			lazy = []rune{RuneLazy, RuneLazy}
+		}
 		begin = ctx.node()
 		end = ctx.node()
 		b, e := recursiveNewFromRegexp(r.Sub[0], ctx)
-		begin.T = append(begin.T, T{N: b})
+		begin.T = append(begin.T, T{R: lazy, N: b})
 		begin.T = append(begin.T, T{N: end})
-		e.T = append(e.T, T{N: b})
+		e.T = append(e.T, T{R: lazy, N: b})
 		e.T = append(e.T, T{N: end})
 
 	case syntax.OpPlus:
+		var lazy []rune
+		if r.Flags&syntax.NonGreedy != 0 {
+			lazy = []rune{RuneLazy, RuneLazy}
+		}
 		begin = ctx.node()
 		end = ctx.node()
 		b, e := recursiveNewFromRegexp(r.Sub[0], ctx)
 		begin.T = append(begin.T, T{N: b})
-		e.T = append(e.T, T{N: b})
+		e.T = append(e.T, T{R: lazy, N: b})
 		e.T = append(e.T, T{N: end})
 
 	case syntax.OpQuest:
+		var lazy []rune
+		if r.Flags&syntax.NonGreedy != 0 {
+			lazy = []rune{RuneLazy, RuneLazy}
+		}
 		begin = ctx.node()
 		end = ctx.node()
 		b, e := recursiveNewFromRegexp(r.Sub[0], ctx)
-		begin.T = append(begin.T, T{N: b})
+		begin.T = append(begin.T, T{R: lazy, N: b})
 		begin.T = append(begin.T, T{N: end})
 		e.T = append(e.T, T{N: end})
 

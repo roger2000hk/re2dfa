@@ -66,6 +66,13 @@ func TestGenerateTests(t *testing.T) {
 		{"(?m)^", "StartOfLineEmpty"},
 		{"(?m)a$", "EndOfLine"},
 		{`a\b`, "WordBoundary"},
+		{`a??`, "lazy1"},
+		{`a??b`, "lazy2"},
+		{`a*?`, "lazy3"},
+		{`a*?b`, "lazy4"},
+		{`a+?`, "lazy5"},
+		{`a+?b`, "lazy6"},
+		{`ab??c`, "lazy7"},
 	}
 	for _, tst := range tests {
 		nfanode, err := nfa.New(tst.pattern)

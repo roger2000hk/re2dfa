@@ -287,3 +287,145 @@ func TestWordBoundary(t *testing.T) {
 		}
 	}
 }
+
+func TestLazy1(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", 0},
+		{"a", 0},
+		{"aa", 0},
+	}
+	for _, tc := range testCases {
+		got := matchLazy1(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy1(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestLazy2(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"a", -1},
+		{"b", 1},
+		{"aa", -1},
+		{"ab", 2},
+		{"ac", -1},
+	}
+	for _, tc := range testCases {
+		got := matchLazy2(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy2(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestLazy3(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", 0},
+		{"a", 0},
+		{"b", 0},
+		{"aa", 0},
+		{"aaa", 0},
+	}
+	for _, tc := range testCases {
+		got := matchLazy3(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy3(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestLazy4(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"a", -1},
+		{"ab", 2},
+		{"b", 1},
+		{"aab", 3},
+		{"aaab", 4},
+	}
+	for _, tc := range testCases {
+		got := matchLazy4(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy4(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestLazy5(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"a", 1},
+		{"b", -1},
+		{"aa", 1},
+		{"aaa", 1},
+	}
+	for _, tc := range testCases {
+		got := matchLazy5(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy5(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestLazy6(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"a", -1},
+		{"ab", 2},
+		{"b", -1},
+		{"aab", 3},
+		{"aaab", 4},
+	}
+	for _, tc := range testCases {
+		got := matchLazy6(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy6(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestLazy7(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"a", -1},
+		{"b", -1},
+		{"c", -1},
+		{"ac", 2},
+		{"abc", 3},
+	}
+	for _, tc := range testCases {
+		got := matchLazy7(tc.in)
+		if got != tc.want {
+			t.Errorf("matchLazy7(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
