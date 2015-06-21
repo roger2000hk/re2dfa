@@ -38,7 +38,6 @@ s3:
 		goto s2
 	}
 	lazyStack = append(lazyStack, jmp{s: 3, i: i})
-	goto lazy
 lazy:
 	if end >= 0 || len(lazyStack) == 0 {
 		return

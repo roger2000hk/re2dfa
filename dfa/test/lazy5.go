@@ -42,7 +42,6 @@ s3:
 		end = i
 		goto s2
 	}
-	goto lazy
 lazy:
 	if end >= 0 || len(lazyStack) == 0 {
 		return
