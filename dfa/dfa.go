@@ -298,7 +298,7 @@ outer:
 					}
 					if len(t.N.T) > 0 {
 						fmt.Fprintf(&buf, "goto s%d\n", t.N.S)
-					} else {
+					} else if hasNonEmpty {
 						fmt.Fprintln(&buf, "return")
 					}
 				}
