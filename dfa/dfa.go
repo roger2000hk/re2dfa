@@ -79,6 +79,22 @@ func recursiveClosure(node *nfa.Node, visited map[*nfa.Node]struct{}) []*nfa.Nod
 	return cls
 }
 
+func closure(node *nfa.Node, cache map[*nfa.Node][]*nfa.Node) []*nfa.Node {
+	if cache != nil {
+		if cls, ok := cache[node]; ok {
+			return cls
+		}
+	}
+
+	cls := recursiveClosure(node, nil)
+
+	if cache != nil {
+		cache[node] = cls
+	}
+
+	return cls
+}
+
 func labelFromClosure(cls []*nfa.Node) string {
 	m := make(map[int]struct{})
 	for _, n := range cls {
@@ -102,22 +118,6 @@ func isFinal(cls []*nfa.Node) bool {
 		}
 	}
 	return false
-}
-
-func closure(node *nfa.Node, cache map[*nfa.Node][]*nfa.Node) []*nfa.Node {
-	if cache != nil {
-		if cls, ok := cache[node]; ok {
-			return cls
-		}
-	}
-
-	cls := recursiveClosure(node, nil)
-
-	if cache != nil {
-		cache[node] = cls
-	}
-
-	return cls
 }
 
 func union(cls ...[]*nfa.Node) []*nfa.Node {
