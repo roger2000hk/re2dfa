@@ -13,8 +13,7 @@ re2dfa transforms regular expressions into deterministic finite state machines a
 
 # TODO
 
-* Support non-greedy matches.
-* Optimize generation from regular expressions containing broad unicode ranges, such as `.*` or `[^a-z]`.
+* Optimize generation from regular expressions containing multiple broad unicode ranges, such as `.*` or `[^a-z]`.
 
 # License
 
