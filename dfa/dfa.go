@@ -258,6 +258,7 @@ outer:
 
 	needUtf8 := false
 	atLeastOneSwitch := false
+	usesIsWordChar := false
 
 	var buf bytes.Buffer
 
@@ -287,6 +288,9 @@ outer:
 			fmt.Fprintln(&buf, "switch {")
 			for _, t := range n.T {
 				for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
+					if t.R[i] == -500 || t.R[i] == -600 { // WordBoundary | NoWordBoundary
+						usesIsWordChar = true
+					}
 					fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:i+2], false))
 					if t.N.F {
 						fmt.Fprintln(&buf, "end = i")
@@ -333,6 +337,14 @@ outer:
 		imports = `import "unicode/utf8"`
 	}
 
+	helperFuncs := ""
+	if usesIsWordChar {
+		helperFuncs = `
+			//func isWordChar(r byte) bool {
+			//        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
+			//}`
+	}
+
 	end := -1
 	if nodes[0].F {
 		end = 0
@@ -343,9 +355,7 @@ outer:
 
 			package %s
 			%s
-			//func isWordChar(r byte) bool {
-			//        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
-			//}
+			%s
 
 			func %s(s %s) (end int) {
 				end = %d
@@ -353,7 +363,7 @@ outer:
 				var rlen int
 				i := 0
 				_, _, _ = r, rlen, i
-`, packageName, imports, funcName, typ, end)
+`, packageName, imports, helperFuncs, funcName, typ, end)
 	buf2.Write(buf.Bytes())
 	if !atLeastOneSwitch {
 		fmt.Fprintln(&buf2, "return")
