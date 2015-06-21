@@ -245,11 +245,6 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 	nodes := allNodes(dfa, make(map[*Node]struct{}))
 	sort.Sort(nodesByState(nodes))
 
-	end := -1
-	if nodes[0].F {
-		end = 0
-	}
-
 	labelFirstState := false
 outer:
 	for _, n := range nodes {
@@ -336,6 +331,11 @@ outer:
 	imports := ""
 	if needUtf8 {
 		imports = `import "unicode/utf8"`
+	}
+
+	end := -1
+	if nodes[0].F {
+		end = 0
 	}
 
 	var buf2 bytes.Buffer
