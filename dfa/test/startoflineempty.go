@@ -9,7 +9,7 @@ func matchStartOfLineEmpty(s string) (end int) {
 	i := 0
 	_, _, _ = r, rlen, i
 	switch {
-	case i == rlen || r == '\n':
+	case i == 0 || r == '\n':
 		end = i
 	}
 	return

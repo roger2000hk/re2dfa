@@ -9,7 +9,7 @@ func matchStartOfTextEmpty(s string) (end int) {
 	i := 0
 	_, _, _ = r, rlen, i
 	switch {
-	case i == rlen:
+	case i == 0:
 		end = i
 	}
 	return

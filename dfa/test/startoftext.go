@@ -11,7 +11,7 @@ func matchStartOfText(s string) (end int) {
 	i := 0
 	_, _, _ = r, rlen, i
 	switch {
-	case i == rlen:
+	case i == 0:
 		goto s2
 	}
 	return

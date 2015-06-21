@@ -11,7 +11,7 @@ func matchStartOfLine(s string) (end int) {
 	i := 0
 	_, _, _ = r, rlen, i
 	switch {
-	case i == rlen || r == '\n':
+	case i == 0 || r == '\n':
 		goto s2
 	}
 	return
