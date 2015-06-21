@@ -268,8 +268,10 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 			}
 		}
 	}
+	returnOrBacktrack := "return"
 	if enableLazy {
 		lazyStates = make(map[int]struct{})
+		returnOrBacktrack = "goto lazy"
 	}
 
 	needUtf8 := false
@@ -340,11 +342,7 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 					if len(t.N.T) > 0 {
 						fmt.Fprintf(&buf, "goto s%d\n", t.N.S)
 					} else if hasNonEmpty {
-						if enableLazy {
-							fmt.Fprintln(&buf, "goto lazy")
-						} else {
-							fmt.Fprintln(&buf, "return")
-						}
+						fmt.Fprintln(&buf, returnOrBacktrack)
 					}
 				}
 			}
@@ -354,12 +352,11 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 		if hasNonEmpty {
 			atLeastOneSwitch = true
 			needUtf8 = true
-			if enableLazy {
-				fmt.Fprintf(&buf, "r, rlen = utf8.DecodeRune%s(s[i:])\nif rlen == 0 { goto lazy }\ni += rlen\n", instr)
-			} else {
-				fmt.Fprintf(&buf, "r, rlen = utf8.DecodeRune%s(s[i:])\nif rlen == 0 { return }\ni += rlen\n", instr)
-			}
-			fmt.Fprintln(&buf, "switch {")
+			fmt.Fprintf(&buf, `r, rlen = utf8.DecodeRune%s(s[i:])
+						if rlen == 0 { %s }
+						i += rlen
+						switch {
+						`, instr, returnOrBacktrack)
 			for _, t := range n.T {
 				i := 0
 				for i < len(t.R) && t.R[0] < 0 {
@@ -379,12 +376,8 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 			}
 			fmt.Fprintln(&buf, "}")
 		}
-		if enableLazy {
-			if ni != len(nodes)-1 {
-				fmt.Fprintln(&buf, "goto lazy")
-			}
-		} else {
-			fmt.Fprintln(&buf, "return")
+		if !enableLazy || ni != len(nodes)-1 {
+			fmt.Fprintln(&buf, returnOrBacktrack)
 		}
 	}
 
