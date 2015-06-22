@@ -11,14 +11,14 @@
 // You should have received a copy of the GNU General Public License along
 // with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package dfa
+package rr
 
 import (
 	"reflect"
 	"testing"
 )
 
-func TestAppendToRange(t *testing.T) {
+func TestAdd(t *testing.T) {
 	type testCase struct {
 		a    []rune
 		r    rune
@@ -34,14 +34,14 @@ func TestAppendToRange(t *testing.T) {
 		{[]rune{'c', 'z'}, 'q', []rune{'c', 'z'}},
 	}
 	for _, tc := range testCases {
-		got := addToRange(tc.a, tc.r)
+		got := Add(tc.a, tc.r)
 		if !reflect.DeepEqual(got, tc.want) {
-			t.Errorf("addToRange(%q, %c) = %q, want %q", string(tc.a), tc.r, string(got), string(tc.want))
+			t.Errorf("Add(%q, %c) = %q, want %q", string(tc.a), tc.r, string(got), string(tc.want))
 		}
 	}
 }
 
-func TestFoldRanges(t *testing.T) {
+func TestSum(t *testing.T) {
 	type testCase struct {
 		a, b []rune
 		want []rune
@@ -60,9 +60,9 @@ func TestFoldRanges(t *testing.T) {
 		{[]rune{'a', 't'}, []rune{'x', 'z'}, []rune{'a', 't', 'x', 'z'}},
 	}
 	for _, tc := range testCases {
-		got := foldRanges(tc.a, tc.b)
+		got := Sum(tc.a, tc.b)
 		if !reflect.DeepEqual(got, tc.want) {
-			t.Errorf("foldRanges(%q, %q) = %q, want %q", string(tc.a), string(tc.b), string(got), string(tc.want))
+			t.Errorf("Sum(%q, %q) = %q, want %q", string(tc.a), string(tc.b), string(got), string(tc.want))
 		}
 	}
 }
