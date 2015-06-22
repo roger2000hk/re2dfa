@@ -13,7 +13,11 @@
 
 package nfa
 
-import "regexp/syntax"
+import (
+	"regexp/syntax"
+
+	"github.com/opennota/re2dfa/rr"
+)
 
 const (
 	// Last unicode rune
@@ -119,6 +123,9 @@ func opString(op syntax.Op) string {
 }
 
 func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *Node) {
+	caseInsensitive := r.Flags&syntax.FoldCase != 0
+	nonGreedy := r.Flags&syntax.NonGreedy != 0
+
 	switch r.Op {
 	case syntax.OpEmptyMatch:
 		begin = ctx.node()
@@ -129,14 +136,22 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 		cur := begin
 		for _, r := range r.Rune {
 			end = ctx.node()
-			cur.T = append(cur.T, T{R: []rune{r, r}, N: end})
+			if caseInsensitive {
+				cur.T = append(cur.T, T{R: rr.FoldCase([]rune{r, r}), N: end})
+			} else {
+				cur.T = append(cur.T, T{R: []rune{r, r}, N: end})
+			}
 			cur = end
 		}
 
 	case syntax.OpCharClass:
 		begin = ctx.node()
 		end = ctx.node()
-		begin.T = append(begin.T, T{R: r.Rune, N: end})
+		if caseInsensitive {
+			begin.T = append(begin.T, T{R: rr.FoldCase(r.Rune), N: end})
+		} else {
+			begin.T = append(begin.T, T{R: r.Rune, N: end})
+		}
 
 	case syntax.OpAnyCharNotNL:
 		begin = ctx.node()
@@ -183,7 +198,7 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 
 	case syntax.OpStar:
 		var lazy []rune
-		if r.Flags&syntax.NonGreedy != 0 {
+		if nonGreedy {
 			lazy = []rune{RuneLazy, RuneLazy}
 		}
 		begin = ctx.node()
@@ -196,7 +211,7 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 
 	case syntax.OpPlus:
 		var lazy []rune
-		if r.Flags&syntax.NonGreedy != 0 {
+		if nonGreedy {
 			lazy = []rune{RuneLazy, RuneLazy}
 		}
 		begin = ctx.node()
@@ -208,7 +223,7 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 
 	case syntax.OpQuest:
 		var lazy []rune
-		if r.Flags&syntax.NonGreedy != 0 {
+		if nonGreedy {
 			lazy = []rune{RuneLazy, RuneLazy}
 		}
 		begin = ctx.node()

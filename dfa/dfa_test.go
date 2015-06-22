@@ -73,6 +73,8 @@ func TestGenerateTests(t *testing.T) {
 		{`a+?`, "lazy5"},
 		{`a+?b`, "lazy6"},
 		{`ab??c`, "lazy7"},
+		{`(?i)aZ`, "IgnoreCase1"},
+		{`(?i)[a-z]`, "IgnoreCase2"},
 	}
 	for _, tst := range tests {
 		nfanode, err := nfa.New(tst.pattern)

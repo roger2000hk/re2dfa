@@ -89,6 +89,7 @@ func TestMatchLiteral(t *testing.T) {
 		{"abcdef", 6},
 		{"abcdefg", 6},
 		{"abcdeg", -1},
+		{"AbCdeF", -1},
 	}
 	for _, tc := range testCases {
 		got := matchLiteral(tc.in)
@@ -426,6 +427,54 @@ func TestLazy7(t *testing.T) {
 		got := matchLazy7(tc.in)
 		if got != tc.want {
 			t.Errorf("matchLazy7(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestIgnoreCase1(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"a", -1},
+		{"z", -1},
+		{"ab", -1},
+		{"az", 2},
+		{"aZ", 2},
+		{"Az", 2},
+		{"AZ", 2},
+		{"aza", 2},
+	}
+	for _, tc := range testCases {
+		got := matchIgnoreCase1(tc.in)
+		if got != tc.want {
+			t.Errorf("matchIgnoreCase1(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestIgnoreCase2(t *testing.T) {
+	type testCase struct {
+		in   string
+		want int
+	}
+	testCases := []testCase{
+		{"", -1},
+		{"@", -1},
+		{"a", 1},
+		{"ab", 1},
+		{"p", 1},
+		{"z", 1},
+		{"A", 1},
+		{"Q", 1},
+		{"Z", 1},
+	}
+	for _, tc := range testCases {
+		got := matchIgnoreCase2(tc.in)
+		if got != tc.want {
+			t.Errorf("matchIgnoreCase2(%q) = %d, want %d", tc.in, got, tc.want)
 		}
 	}
 }

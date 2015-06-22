@@ -13,6 +13,8 @@
 
 package rr
 
+import "unicode"
+
 func In(ranges []rune, r rune) bool {
 	for i := 0; i < len(ranges); i += 2 {
 		if r >= ranges[i] && r <= ranges[i+1] {
@@ -98,4 +100,22 @@ func Sum(a, b []rune) []rune {
 	}
 
 	return d
+}
+
+func FoldCase(ranges []rune) []rune {
+	rr := make([]rune, len(ranges))
+	copy(rr, ranges)
+	for i := 0; i < len(ranges); i += 2 {
+		for r := ranges[i]; r <= ranges[i+1]; r++ {
+			lc := unicode.ToLower(r)
+			if lc != r {
+				rr = Add(rr, lc)
+			}
+			uc := unicode.ToUpper(r)
+			if uc != r {
+				rr = Add(rr, uc)
+			}
+		}
+	}
+	return rr
 }
