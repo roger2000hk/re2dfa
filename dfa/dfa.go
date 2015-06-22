@@ -226,6 +226,16 @@ func allNodes(n *Node, visited map[*Node]struct{}) []*Node {
 	return nodes
 }
 
+func filter(nodes []*Node, fn func(n *Node) bool) []*Node {
+	nn := make([]*Node, 0, len(nodes))
+	for _, n := range nodes {
+		if fn(n) {
+			nn = append(nn, n)
+		}
+	}
+	return nn
+}
+
 type nodesByState []*Node
 
 func (s nodesByState) Len() int           { return len(s) }
@@ -243,6 +253,9 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 	}
 
 	nodes := allNodes(dfa, make(map[*Node]struct{}))
+	nodes = filter(nodes, func(n *Node) bool {
+		return len(n.T) > 0
+	})
 	sort.Sort(nodesByState(nodes))
 
 	labelFirstState := false
@@ -281,10 +294,6 @@ func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
 	var buf bytes.Buffer
 
 	for ni, n := range nodes {
-		if len(n.T) == 0 {
-			continue
-		}
-
 		if n.S != 1 || labelFirstState {
 			fmt.Fprintf(&buf, "s%d:\n", n.S)
 		}
