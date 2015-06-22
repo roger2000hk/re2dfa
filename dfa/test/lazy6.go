@@ -49,7 +49,6 @@ s3:
 	case r == 97:
 		goto s2
 	}
-	goto lazy
 lazy:
 	if end >= 0 || len(lazyStack) == 0 {
 		return

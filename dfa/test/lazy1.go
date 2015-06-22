@@ -30,7 +30,6 @@ s2:
 	case r == 97:
 		end = i
 	}
-	goto lazy
 lazy:
 	if end >= 0 || len(lazyStack) == 0 {
 		return

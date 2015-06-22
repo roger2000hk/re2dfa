@@ -50,7 +50,6 @@ s3:
 	case r == 98:
 		end = i
 	}
-	goto lazy
 lazy:
 	if end >= 0 || len(lazyStack) == 0 {
 		return
