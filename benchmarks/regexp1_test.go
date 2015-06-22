@@ -74,7 +74,7 @@ func BenchmarkFSM1(b *testing.B) {
 func BenchmarkRegexp1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, s := range rx1TestStrings {
-			rx1.MatchString(s)
+			rx1.FindStringIndex(s)
 		}
 	}
 }
