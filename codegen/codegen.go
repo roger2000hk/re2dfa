@@ -103,6 +103,7 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 
 	labelFirstState := false
 	enableLazy := false
+	lazyCount := 0
 	var lazyStates map[int]struct{}
 	for i, n := range nodes {
 		for _, t := range n.T {
@@ -118,6 +119,7 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 			}
 			if hasLazy {
 				enableLazy = true
+				lazyCount++
 				if i == 0 {
 					labelFirstState = true
 				}
@@ -275,10 +277,11 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 		var rlen int
 		i := 0`
 	if enableLazy {
-		decls += `
+		decls += fmt.Sprintf(`
 			lazyOn := false
 			type jmp struct { s, i int }
-			var lazyStack []jmp`
+			var lazyArr [%d]jmp
+			lazyStack := lazyArr[:0]`, lazyCount)
 	}
 
 	var buf2 bytes.Buffer
