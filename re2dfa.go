@@ -30,8 +30,12 @@ import (
 func main() {
 	log.SetFlags(0)
 
+	output := flag.String("o", "", "Output to file")
 	flag.Usage = func() {
-		fmt.Println(`Usage: re2dfa regexp package.function string|[]byte
+		fmt.Println(`Usage: re2dfa [options] regexp package.function string|[]byte
+
+Options:
+    -o FILE    Output to FILE instead of standard output
 
 EXAMPLE: re2dfa ^a+$ main.matchAPlus string
 `)
@@ -68,5 +72,23 @@ EXAMPLE: re2dfa ^a+$ main.matchAPlus string
 	}
 
 	node := dfa.NewFromNFA(nfanode)
-	fmt.Println(codegen.GoGenerate(node, pkg, fun, typ))
+	source := codegen.GoGenerate(node, pkg, fun, typ)
+	if *output == "" {
+		fmt.Println(source)
+	} else {
+		f, err := os.Create(*output)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_, err = f.WriteString(source)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
