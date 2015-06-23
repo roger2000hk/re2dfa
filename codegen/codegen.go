@@ -129,7 +129,7 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 	returnOrBacktrack := "return"
 	if enableLazy {
 		lazyStates = make(map[int]struct{})
-		returnOrBacktrack = "goto lazy"
+		returnOrBacktrack = "goto bt"
 	}
 
 	needUtf8 := false
@@ -167,8 +167,8 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 					if t.R[i] != nfa.RuneLazy {
 						continue
 					}
-					fmt.Fprintf(&buf, `if lazyOn {
-								lazyOn = false
+					fmt.Fprintf(&buf, `if lazy {
+								lazy = false
 								goto s%d
 							}
 							lazyStack = append(lazyStack, jmp{s:%d, i:i})
@@ -236,11 +236,11 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 	}
 
 	if enableLazy {
-		fmt.Fprintln(&buf, `lazy:
+		fmt.Fprintln(&buf, `bt:
 					if end >= 0 || len(lazyStack) == 0 { return }
 					var to jmp
 					to, lazyStack = lazyStack[len(lazyStack)-1], lazyStack[:len(lazyStack)-1]
-					lazyOn = true
+					lazy = true
 					i = to.i
 					switch to.s {`)
 		states := make([]int, 0, len(lazyStates))
@@ -278,7 +278,7 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 		i := 0`
 	if enableLazy {
 		decls += fmt.Sprintf(`
-			lazyOn := false
+			lazy := false
 			type jmp struct { s, i int }
 			var lazyArr [%d]jmp
 			lazyStack := lazyArr[:0]`, lazyCount)
