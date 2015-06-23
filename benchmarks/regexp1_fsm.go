@@ -11,7 +11,8 @@ func match1(s string) (end int) {
 	i := 0
 	lazyOn := false
 	type jmp struct{ s, i int }
-	var lazyStack []jmp
+	var lazyArr [4]jmp
+	lazyStack := lazyArr[:0]
 	_, _, _ = r, rlen, i
 	switch {
 	case i == 0:
@@ -36,14 +37,14 @@ s3:
 	}
 	i += rlen
 	switch {
-	case r >= 65 && r <= 90 || r >= 97 && r <= 122:
-		goto s42
 	case r == 33:
 		goto s4
 	case r == 47:
 		goto s32
 	case r == 63:
 		goto s37
+	case r >= 65 && r <= 90 || r >= 97 && r <= 122:
+		goto s42
 	}
 	goto lazy
 s4:
@@ -461,14 +462,14 @@ s42:
 	}
 	i += rlen
 	switch {
-	case r == 62:
-		end = i
-	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
-		goto s43
 	case r == 45 || r >= 48 && r <= 57 || r >= 65 && r <= 90 || r >= 97 && r <= 122:
 		goto s59
 	case r == 47:
 		goto s44
+	case r == 62:
+		end = i
+	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
+		goto s43
 	}
 	goto lazy
 s43:
@@ -478,14 +479,14 @@ s43:
 	}
 	i += rlen
 	switch {
+	case r == 47:
+		goto s44
 	case r == 58 || r >= 65 && r <= 90 || r == 95 || r >= 97 && r <= 122:
 		goto s46
 	case r == 62:
 		end = i
 	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
 		goto s43
-	case r == 47:
-		goto s44
 	}
 	goto lazy
 s44:
@@ -506,6 +507,8 @@ s46:
 	}
 	i += rlen
 	switch {
+	case r == 47:
+		goto s44
 	case r == 61:
 		goto s48
 	case r == 62:
@@ -514,8 +517,6 @@ s46:
 		goto s47
 	case r >= 45 && r <= 46 || r >= 48 && r <= 58 || r >= 65 && r <= 90 || r == 95 || r >= 97 && r <= 122:
 		goto s58
-	case r == 47:
-		goto s44
 	}
 	goto lazy
 s47:
@@ -544,14 +545,14 @@ s48:
 	}
 	i += rlen
 	switch {
+	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
+		goto s49
 	case r == 33 || r >= 35 && r <= 38 || r >= 40 && r <= 59 || r >= 63 && r <= 95 || r >= 97:
 		goto s50
 	case r == 34:
 		goto s52
 	case r == 39:
 		goto s55
-	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
-		goto s49
 	}
 	goto lazy
 s49:
@@ -612,10 +613,10 @@ s52:
 	}
 	i += rlen
 	switch {
-	case r <= 33 || r >= 35:
-		goto s53
 	case r == 34:
 		goto s54
+	case r <= 33 || r >= 35:
+		goto s53
 	}
 	goto lazy
 s53:
@@ -638,12 +639,12 @@ s54:
 	}
 	i += rlen
 	switch {
+	case r == 47:
+		goto s44
 	case r == 62:
 		end = i
 	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
 		goto s43
-	case r == 47:
-		goto s44
 	}
 	goto lazy
 s55:
@@ -679,12 +680,12 @@ s57:
 	}
 	i += rlen
 	switch {
-	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
-		goto s43
 	case r == 47:
 		goto s44
 	case r == 62:
 		end = i
+	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
+		goto s43
 	}
 	goto lazy
 s58:
@@ -694,16 +695,16 @@ s58:
 	}
 	i += rlen
 	switch {
-	case r == 47:
-		goto s44
-	case r == 61:
-		goto s48
 	case r == 62:
 		end = i
 	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
 		goto s47
 	case r >= 45 && r <= 46 || r >= 48 && r <= 58 || r >= 65 && r <= 90 || r == 95 || r >= 97 && r <= 122:
 		goto s58
+	case r == 47:
+		goto s44
+	case r == 61:
+		goto s48
 	}
 	goto lazy
 s59:
@@ -713,14 +714,14 @@ s59:
 	}
 	i += rlen
 	switch {
-	case r == 62:
-		end = i
 	case r >= 9 && r <= 10 || r >= 12 && r <= 13 || r == 32:
 		goto s43
 	case r == 45 || r >= 48 && r <= 57 || r >= 65 && r <= 90 || r >= 97 && r <= 122:
 		goto s59
 	case r == 47:
 		goto s44
+	case r == 62:
+		end = i
 	}
 lazy:
 	if end >= 0 || len(lazyStack) == 0 {

@@ -11,7 +11,8 @@ func matchLazy7(s string) (end int) {
 	i := 0
 	lazyOn := false
 	type jmp struct{ s, i int }
-	var lazyStack []jmp
+	var lazyArr [1]jmp
+	lazyStack := lazyArr[:0]
 	_, _, _ = r, rlen, i
 	r, rlen = utf8.DecodeRuneInString(s[i:])
 	if rlen == 0 {

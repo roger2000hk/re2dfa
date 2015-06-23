@@ -11,7 +11,8 @@ func matchLazy2(s string) (end int) {
 	i := 0
 	lazyOn := false
 	type jmp struct{ s, i int }
-	var lazyStack []jmp
+	var lazyArr [1]jmp
+	lazyStack := lazyArr[:0]
 	_, _, _ = r, rlen, i
 s1:
 	if lazyOn {
