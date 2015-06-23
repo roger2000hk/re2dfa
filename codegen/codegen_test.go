@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License along
 // with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package dfa
+package codegen
 
 import (
 	"os"
@@ -19,6 +19,7 @@ import (
 	"testing"
 	"unicode"
 
+	"github.com/opennota/re2dfa/dfa"
 	"github.com/opennota/re2dfa/nfa"
 )
 
@@ -81,7 +82,7 @@ func TestGenerateTests(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		} else {
-			node := NewFromNFA(nfanode)
+			node := dfa.NewFromNFA(nfanode)
 			source := GoGenerate(node, "test", "match"+uppercaseInitial(tst.name), "string")
 			err := writeToFile("test/"+strings.ToLower(tst.name)+".go", source)
 			if err != nil {

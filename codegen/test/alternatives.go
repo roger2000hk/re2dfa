@@ -16,10 +16,10 @@ func matchAlternatives(s string) (end int) {
 	}
 	i += rlen
 	switch {
-	case r == 100:
-		goto s5
 	case r == 97:
 		goto s2
+	case r == 100:
+		goto s5
 	}
 	return
 s2:

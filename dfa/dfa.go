@@ -14,10 +14,9 @@
 package dfa
 
 import (
-	"bytes"
-	"fmt"
-	"go/format"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/opennota/re2dfa/nfa"
 	"github.com/opennota/runerange"
@@ -94,6 +93,18 @@ func closure(node *nfa.Node, cache map[*nfa.Node][]*nfa.Node) []*nfa.Node {
 	}
 
 	return cls
+}
+
+func intsToStrings(a []int) []string {
+	s := make([]string, 0, len(a))
+	for _, i := range a {
+		s = append(s, strconv.Itoa(i))
+	}
+	return s
+}
+
+func makeLabel(a []int) string {
+	return strings.Join(intsToStrings(a), ",")
 }
 
 func labelFromClosure(cls []*nfa.Node) string {
@@ -211,256 +222,4 @@ func firstNode(nfanode *nfa.Node, ctx *context) *Node {
 	ctx.nodesByLabel[label] = node
 
 	return node
-}
-
-func allNodes(n *Node, visited map[*Node]struct{}) []*Node {
-	if _, ok := visited[n]; ok {
-		return nil
-	}
-	visited[n] = struct{}{}
-
-	nodes := []*Node{n}
-	for _, t := range n.T {
-		nodes = append(nodes, allNodes(t.N, visited)...)
-	}
-
-	return nodes
-}
-
-func filter(nodes []*Node, fn func(n *Node) bool) []*Node {
-	nn := make([]*Node, 0, len(nodes))
-	for _, n := range nodes {
-		if fn(n) {
-			nn = append(nn, n)
-		}
-	}
-	return nn
-}
-
-type nodesByState []*Node
-
-func (s nodesByState) Len() int           { return len(s) }
-func (s nodesByState) Less(i, j int) bool { return s[i].S < s[j].S }
-func (s nodesByState) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-
-func GoGenerate(dfa *Node, packageName, funcName, typ string) string {
-	if !(typ == "string" || typ == "[]byte") {
-		panic(fmt.Sprintf("invalid type: %s; expected either string or []byte", typ))
-	}
-
-	instr := ""
-	if typ == "string" {
-		instr = "InString"
-	}
-
-	nodes := allNodes(dfa, make(map[*Node]struct{}))
-	nodes = filter(nodes, func(n *Node) bool {
-		return len(n.T) > 0
-	})
-	sort.Sort(nodesByState(nodes))
-
-	labelFirstState := false
-	enableLazy := false
-	var lazyStates map[int]struct{}
-	for i, n := range nodes {
-		for _, t := range n.T {
-			if t.N == nodes[0] {
-				labelFirstState = true
-			}
-			hasLazy := false
-			for i := 0; i < len(t.R); i += 2 {
-				if t.R[i] == nfa.RuneLazy {
-					hasLazy = true
-					break
-				}
-			}
-			if hasLazy {
-				enableLazy = true
-				if i == 0 {
-					labelFirstState = true
-				}
-			}
-		}
-	}
-	returnOrBacktrack := "return"
-	if enableLazy {
-		lazyStates = make(map[int]struct{})
-		returnOrBacktrack = "goto lazy"
-	}
-
-	needUtf8 := false
-	atLeastOneSwitch := false
-	usesIsWordChar := false
-
-	var buf bytes.Buffer
-
-	for ni, n := range nodes {
-		if n.S != 1 || labelFirstState {
-			fmt.Fprintf(&buf, "s%d:\n", n.S)
-		}
-
-		hasEmpty := false
-		hasNonEmpty := false
-		hasLazy := false
-		for _, t := range n.T {
-			for i := 0; i < len(t.R); i += 2 {
-				if t.R[i] < 0 {
-					if t.R[i] == nfa.RuneLazy {
-						hasLazy = true
-					} else {
-						hasEmpty = true
-					}
-				} else {
-					hasNonEmpty = true
-				}
-			}
-		}
-
-		if hasLazy {
-			lazyStates[n.S] = struct{}{}
-			for _, t := range n.T {
-				for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
-					if t.R[i] != nfa.RuneLazy {
-						continue
-					}
-					fmt.Fprintf(&buf, `if lazyOn {
-								lazyOn = false
-								goto s%d
-							}
-							lazyStack = append(lazyStack, jmp{s:%d, i:i})
-							`, t.N.S, n.S)
-					break
-				}
-			}
-		}
-
-		if hasEmpty {
-			atLeastOneSwitch = true
-			fmt.Fprintln(&buf, "switch {")
-			for _, t := range n.T {
-				for i := 0; i < len(t.R) && t.R[i] < 0; i += 2 {
-					if t.R[i] == nfa.RuneLazy {
-						continue
-					}
-					if t.R[i] == nfa.RuneWordBoundary || t.R[i] == nfa.RuneNoWordBoundary {
-						usesIsWordChar = true
-					}
-					fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:i+2], false))
-					if t.N.F {
-						fmt.Fprintln(&buf, "end = i")
-					}
-					if len(t.N.T) > 0 {
-						fmt.Fprintf(&buf, "goto s%d\n", t.N.S)
-					} else if hasNonEmpty {
-						fmt.Fprintln(&buf, returnOrBacktrack)
-					}
-				}
-			}
-			fmt.Fprintln(&buf, "}")
-		}
-
-		if hasNonEmpty {
-			atLeastOneSwitch = true
-			needUtf8 = true
-			fmt.Fprintf(&buf, `r, rlen = utf8.DecodeRune%s(s[i:])
-						if rlen == 0 { %s }
-						i += rlen
-						switch {
-						`, instr, returnOrBacktrack)
-			for _, t := range n.T {
-				i := 0
-				for i < len(t.R) && t.R[0] < 0 {
-					i++
-				}
-				if i >= len(t.R) {
-					continue
-				}
-
-				fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:], false))
-				if t.N.F {
-					fmt.Fprintln(&buf, "end = i")
-				}
-				if len(t.N.T) > 0 {
-					fmt.Fprintf(&buf, "goto s%d\n", t.N.S)
-				}
-			}
-			fmt.Fprintln(&buf, "}")
-		}
-		if !enableLazy || ni != len(nodes)-1 {
-			fmt.Fprintln(&buf, returnOrBacktrack)
-		}
-	}
-
-	if enableLazy {
-		fmt.Fprintln(&buf, `lazy:
-					if end >= 0 || len(lazyStack) == 0 { return }
-					var to jmp
-					to, lazyStack = lazyStack[len(lazyStack)-1], lazyStack[:len(lazyStack)-1]
-					lazyOn = true
-					i = to.i
-					switch to.s {`)
-		states := make([]int, 0, len(lazyStates))
-		for s := range lazyStates {
-			states = append(states, s)
-		}
-		sort.Ints(states)
-		for _, s := range states {
-			fmt.Fprintf(&buf, "case %d: goto s%[1]d\n", s)
-		}
-		fmt.Fprintln(&buf, "}")
-		fmt.Fprintln(&buf, "return")
-	}
-
-	imports := ""
-	if needUtf8 {
-		imports = `import "unicode/utf8"`
-	}
-
-	helperFuncs := ""
-	if usesIsWordChar {
-		helperFuncs = `
-			//func isWordChar(r byte) bool {
-			//        return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9' || r == '_'
-			//}`
-	}
-
-	end := -1
-	if nodes[0].F {
-		end = 0
-	}
-
-	decls := `var r rune
-		var rlen int
-		i := 0`
-	if enableLazy {
-		decls += `
-			lazyOn := false
-			type jmp struct { s, i int }
-			var lazyStack []jmp`
-	}
-
-	var buf2 bytes.Buffer
-	fmt.Fprintf(&buf2, `// Code generated by re2dfa (https://github.com/opennota/re2dfa).
-
-			package %s
-			%s
-			%s
-
-			func %s(s %s) (end int) {
-				end = %d
-				%s
-				_, _, _ = r, rlen, i
-`, packageName, imports, helperFuncs, funcName, typ, end, decls)
-	buf2.Write(buf.Bytes())
-	if !atLeastOneSwitch {
-		fmt.Fprintln(&buf2, "return")
-	}
-	fmt.Fprintln(&buf2, "}")
-
-	source, err := format.Source(buf2.Bytes())
-	if err != nil {
-		panic(err)
-	}
-
-	return string(source)
 }

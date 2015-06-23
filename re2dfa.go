@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/opennota/re2dfa/codegen"
 	"github.com/opennota/re2dfa/dfa"
 	"github.com/opennota/re2dfa/nfa"
 )
@@ -67,5 +68,5 @@ EXAMPLE: re2dfa ^a+$ main.matchAPlus string
 	}
 
 	node := dfa.NewFromNFA(nfanode)
-	fmt.Println(dfa.GoGenerate(node, pkg, fun, typ))
+	fmt.Println(codegen.GoGenerate(node, pkg, fun, typ))
 }
