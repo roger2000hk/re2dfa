@@ -20,7 +20,7 @@ import (
 	"sort"
 
 	"github.com/opennota/re2dfa/nfa"
-	"github.com/opennota/re2dfa/rr"
+	"github.com/opennota/runerange"
 )
 
 type Node struct {
@@ -149,7 +149,7 @@ func union(cls ...[]*nfa.Node) []*nfa.Node {
 func closuresForRune(n *Node, r rune, ctx *context) (closures [][]*nfa.Node) {
 	for _, n := range n.cls {
 		for _, t := range n.T {
-			if rr.In(t.R, r) {
+			if runerange.In(t.R, r) {
 				cls := closure(t.N, ctx.closureCache)
 				closures = append(closures, cls)
 			}
@@ -162,7 +162,7 @@ func constructSubset(root *Node, ctx *context) {
 	var ranges []rune
 	for _, n := range root.cls {
 		for _, t := range n.T {
-			ranges = rr.Sum(ranges, t.R)
+			ranges = runerange.Sum(ranges, t.R)
 		}
 	}
 
@@ -188,7 +188,7 @@ func constructSubset(root *Node, ctx *context) {
 				constructSubset(node, ctx)
 			}
 
-			m[node] = rr.Add(m[node], r)
+			m[node] = runerange.Add(m[node], r)
 		}
 	}
 

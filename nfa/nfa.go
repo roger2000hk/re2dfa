@@ -16,7 +16,7 @@ package nfa
 import (
 	"regexp/syntax"
 
-	"github.com/opennota/re2dfa/rr"
+	"github.com/opennota/runerange"
 )
 
 const (
@@ -137,7 +137,7 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 		for _, r := range r.Rune {
 			end = ctx.node()
 			if caseInsensitive {
-				cur.T = append(cur.T, T{R: rr.FoldCase([]rune{r, r}), N: end})
+				cur.T = append(cur.T, T{R: runerange.Fold([]rune{r, r}), N: end})
 			} else {
 				cur.T = append(cur.T, T{R: []rune{r, r}, N: end})
 			}
@@ -148,7 +148,7 @@ func recursiveNewFromRegexp(r *syntax.Regexp, ctx *context) (begin *Node, end *N
 		begin = ctx.node()
 		end = ctx.node()
 		if caseInsensitive {
-			begin.T = append(begin.T, T{R: rr.FoldCase(r.Rune), N: end})
+			begin.T = append(begin.T, T{R: runerange.Fold(r.Rune), N: end})
 		} else {
 			begin.T = append(begin.T, T{R: r.Rune, N: end})
 		}
