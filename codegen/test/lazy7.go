@@ -9,65 +9,65 @@ func matchLazy7(s string) (end int) {
 	var r rune
 	var rlen int
 	i := 0
-	lazyOn := false
+	lazy := false
 	type jmp struct{ s, i int }
 	var lazyArr [1]jmp
 	lazyStack := lazyArr[:0]
 	_, _, _ = r, rlen, i
 	r, rlen = utf8.DecodeRuneInString(s[i:])
 	if rlen == 0 {
-		goto lazy
+		goto bt
 	}
 	i += rlen
 	switch {
 	case r == 97:
 		goto s2
 	}
-	goto lazy
+	goto bt
 s2:
-	if lazyOn {
-		lazyOn = false
+	if lazy {
+		lazy = false
 		goto s3
 	}
 	lazyStack = append(lazyStack, jmp{s: 2, i: i})
 	r, rlen = utf8.DecodeRuneInString(s[i:])
 	if rlen == 0 {
-		goto lazy
+		goto bt
 	}
 	i += rlen
 	switch {
 	case r == 99:
 		end = i
 	}
-	goto lazy
+	goto bt
 s3:
 	r, rlen = utf8.DecodeRuneInString(s[i:])
 	if rlen == 0 {
-		goto lazy
+		goto bt
 	}
 	i += rlen
 	switch {
 	case r == 98:
 		goto s4
 	}
-	goto lazy
+	goto bt
 s4:
 	r, rlen = utf8.DecodeRuneInString(s[i:])
 	if rlen == 0 {
-		goto lazy
+		goto bt
 	}
 	i += rlen
 	switch {
 	case r == 99:
 		end = i
 	}
-lazy:
+bt:
 	if end >= 0 || len(lazyStack) == 0 {
 		return
 	}
 	var to jmp
 	to, lazyStack = lazyStack[len(lazyStack)-1], lazyStack[:len(lazyStack)-1]
-	lazyOn = true
+	lazy = true
 	i = to.i
 	switch to.s {
 	case 2:
