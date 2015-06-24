@@ -158,10 +158,10 @@ func union(cls ...[]*nfa.Node) []*nfa.Node {
 	return a
 }
 
-func closuresForRune(n *Node, r rune, ctx *context) (closures [][]*nfa.Node) {
+func closuresForRange(n *Node, rr []rune, ctx *context) (closures [][]*nfa.Node) {
 	for _, n := range n.cls {
 		for _, t := range n.T {
-			if runerange.In(t.R, r) {
+			if runerange.Contains(t.R, rr) {
 				cls := closure(t.N, ctx.closureCache)
 				closures = append(closures, cls)
 			}
@@ -171,37 +171,36 @@ func closuresForRune(n *Node, r rune, ctx *context) (closures [][]*nfa.Node) {
 }
 
 func constructSubset(root *Node, ctx *context) {
-	var ranges []rune
+	var ranges [][]rune
 	for _, n := range root.cls {
 		for _, t := range n.T {
-			ranges = runerange.Sum(ranges, t.R)
+			ranges = append(ranges, t.R)
 		}
 	}
+	pairs := runerange.Split(ranges)
 
 	m := make(map[*Node][]rune)
 
-	for i := 0; i < len(ranges); i += 2 {
-		for r := ranges[i]; r <= ranges[i+1]; r++ {
-			cls := union(closuresForRune(root, r, ctx)...)
+	for i := 0; i < len(pairs); i += 2 {
+		cls := union(closuresForRange(root, pairs[i:i+2], ctx)...)
 
-			label := labelFromClosure(cls)
-			var node *Node
-			if n, ok := ctx.nodesByLabel[label]; ok {
-				node = n
-			} else {
-				ctx.state++
-				node = &Node{
-					S:     ctx.state,
-					F:     isFinal(cls),
-					label: label,
-					cls:   cls,
-				}
-				ctx.nodesByLabel[label] = node
-				constructSubset(node, ctx)
+		label := labelFromClosure(cls)
+		var node *Node
+		if n, ok := ctx.nodesByLabel[label]; ok {
+			node = n
+		} else {
+			ctx.state++
+			node = &Node{
+				S:     ctx.state,
+				F:     isFinal(cls),
+				label: label,
+				cls:   cls,
 			}
-
-			m[node] = runerange.Add(m[node], r)
+			ctx.nodesByLabel[label] = node
+			constructSubset(node, ctx)
 		}
+
+		m[node] = runerange.Sum(m[node], pairs[i:i+2])
 	}
 
 	for n, rr := range m {
