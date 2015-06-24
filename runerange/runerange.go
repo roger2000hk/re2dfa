@@ -80,14 +80,14 @@ func Add(ranges []rune, r rune) []rune {
 	return ranges
 }
 
-type byValue []rune
+type pairs []rune
 
-func (r byValue) Len() int           { return len(r) / 2 }
-func (r byValue) Less(i, j int) bool { return r[i*2] < r[j*2] }
-func (r byValue) Swap(i, j int) {
+func (p pairs) Len() int           { return len(p) / 2 }
+func (p pairs) Less(i, j int) bool { return p[i*2] < p[j*2] }
+func (p pairs) Swap(i, j int) {
 	i *= 2
 	j *= 2
-	r[i], r[i+1], r[j], r[j+1] = r[j], r[j+1], r[i], r[i+1]
+	p[i], p[i+1], p[j], p[j+1] = p[j], p[j+1], p[i], p[i+1]
 }
 
 // Sum returns a range containing all the runes from the ranges a and b. The a and b ranges are not modified.
@@ -102,7 +102,7 @@ func Sum(a, b []rune) []rune {
 	c := make([]rune, 0, len(a)+len(b))
 	c = append(c, a...)
 	c = append(c, b...)
-	sort.Sort(byValue(c))
+	sort.Sort(pairs(c))
 
 	d := make([]rune, 0, len(c))
 	d = append(d, c[:2]...)
@@ -224,6 +224,6 @@ outer:
 		}
 		result = append(result, r...)
 	}
-	sort.Sort(byValue(result))
+	sort.Sort(pairs(result))
 	return result
 }
