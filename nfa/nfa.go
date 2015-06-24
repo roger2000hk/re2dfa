@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License along
 // with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Package nfa provides a way to construct non-deterministic finite automata from regular expressions.
+// Package nfa provides a way to construct non-deterministic finite automata from regular expressions using the Thompson's construction algorithm.
 package nfa
 
 import (

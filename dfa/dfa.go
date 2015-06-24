@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License along
 // with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Package dfa provides a way to construct deterministic finite automata from non-deterministic finite automata using Thompson's construction.
+// Package dfa provides a way to construct deterministic finite automata from non-deterministic finite automata.
 package dfa
 
 import (
