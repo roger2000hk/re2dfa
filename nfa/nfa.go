@@ -17,7 +17,7 @@ package nfa
 import (
 	"regexp/syntax"
 
-	"github.com/opennota/runerange"
+	"github.com/opennota/re2dfa/runerange"
 )
 
 const (

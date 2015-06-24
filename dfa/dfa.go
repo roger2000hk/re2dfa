@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/opennota/re2dfa/nfa"
-	"github.com/opennota/runerange"
+	"github.com/opennota/re2dfa/runerange"
 )
 
 type Node struct {
