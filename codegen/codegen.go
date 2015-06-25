@@ -49,7 +49,7 @@ func filter(nodes []*dfa.Node, fn func(n *dfa.Node) bool) []*dfa.Node {
 	return nn
 }
 
-func rangesToBoolExpr(rr []rune, atEnd bool) string {
+func rangesToBoolExpr(rr []rune) string {
 	s := make([]string, 0, len(rr))
 	for i := 0; i < len(rr); i += 2 {
 		if rr[i] < 0 {
@@ -190,7 +190,7 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 					if t.R[i] == nfa.RuneWordBoundary || t.R[i] == nfa.RuneNoWordBoundary {
 						usesIsWordChar = true
 					}
-					fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:i+2], false))
+					fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:i+2]))
 					if t.N.F {
 						fmt.Fprintln(&buf, "end = i")
 					}
@@ -221,7 +221,7 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 					continue
 				}
 
-				fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:], false))
+				fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:]))
 				if t.N.F {
 					fmt.Fprintln(&buf, "end = i")
 				}
