@@ -50,6 +50,10 @@ func filter(nodes []*dfa.Node, fn func(n *dfa.Node) bool) []*dfa.Node {
 }
 
 func rangesToBoolExpr(rr []rune) string {
+	if len(rr) == 4 && rr[0] == 0 && rr[3] == nfa.RuneLast {
+		return fmt.Sprintf("r <= %d || r >= %d", rr[1], rr[2])
+	}
+
 	s := make([]string, 0, len(rr))
 	for i := 0; i < len(rr); i += 2 {
 		if rr[i] < 0 {
