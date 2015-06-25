@@ -84,6 +84,14 @@ func rangesToBoolExpr(rr []rune) string {
 	return strings.Join(s, "||")
 }
 
+func positive(rr []rune) []rune {
+	i := 0
+	for i < len(rr) && rr[i] < 0 {
+		i += 2
+	}
+	return rr[i:]
+}
+
 type nodesByState []*dfa.Node
 
 func (s nodesByState) Len() int           { return len(s) }
@@ -217,15 +225,12 @@ func GoGenerate(root *dfa.Node, packageName, funcName, typ string) string {
 						switch {
 						`, instr, returnOrBacktrack)
 			for _, t := range n.T {
-				i := 0
-				for i < len(t.R) && t.R[0] < 0 {
-					i++
-				}
-				if i >= len(t.R) {
+				rr := positive(t.R)
+				if len(rr) == 0 {
 					continue
 				}
 
-				fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(t.R[i:]))
+				fmt.Fprintf(&buf, "case %s:\n", rangesToBoolExpr(rr))
 				if t.N.F {
 					fmt.Fprintln(&buf, "end = i")
 				}
